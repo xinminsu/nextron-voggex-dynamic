@@ -157,10 +157,10 @@ function Home() {
 
                 <TextArea rows={2} value={outputMsg}/>
 
-                <br/>
-                <br/>
-
             </Content>
+            
+            <br/>
+            <br/>
 
             <ReactECharts  ref={echartRef}
                 option={echartOption}

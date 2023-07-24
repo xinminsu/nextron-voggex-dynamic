@@ -41,7 +41,7 @@ function Home() {
         rawTotalBuffer = Buffer.concat([rawTotalBuffer, msg]);
         let rawBufferU8A:Uint8Array = new Uint8Array(rawTotalBuffer);
         let rawTotalMsg = toHexString(rawBufferU8A);
-        console.log("recv raw hex msg length is " + rawTotalMsg.length);
+        //console.log("recv raw hex msg length is " + rawTotalMsg.length);
         if (curMsg == MsgType.WaveLength && rawTotalMsg.length == 3624) {
             setOutputMsg(getWaveLengthInfo(rawBufferU8A));
         }
@@ -56,39 +56,39 @@ function Home() {
 
     const echartRef =  useRef(null);;
 
-    const sendFunc: () => void = () => {
+    const sendFunc = () => {
         if (sendMsg) {
             let smsg = string2ArrayBuffer(sendMsg.replaceAll(" ", ""));
             socket.send(smsg, remotePort, remoteIP);
         }
     }
 
-    const clearFunc: () => void = () => {
+    const clearFunc = () => {
         setRecvMsg('');
         setOutputMsg('');
     }
 
-    const startFunc: () => void = () => {
+    const startFunc= () => {
 
     }
 
-    const closeFunc: () => void = () => {
+    const closeFunc = () => {
 
     }
 
-    const getWaveLengthFunc: () => void = () => {
+/*    const getWaveLengthFunc = () => {
         let cmdMsg = "30 02 06 00 00 00";
         let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
         setCurMsg(MsgType.WaveLength);
         socket.send(smsg, remotePort, remoteIP);
     }
 
-    const getSpectralViewFunc: () => void = () => {
+    const getSpectralViewFunc = () => {
         let cmdMsg = "30 07 06 00 00 00";
         let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
         setCurMsg(MsgType.SpectralView);
         socket.send(smsg, remotePort, remoteIP);
-    }
+    }*/
 
     const handleChange = (value: MsgType) => {
         setCurMsg(value);
@@ -112,8 +112,8 @@ function Home() {
                     <Space size={16}>
                         <Button onClick={() => startFunc()} size='large' type='primary'>Start</Button>
                         <Button onClick={() => closeFunc()} size='large' type='primary'>Close</Button>
-                        <Button onClick={() => getWaveLengthFunc()} size='large' type='primary'>Wave Leng</Button>
-                        <Button onClick={() => getSpectralViewFunc()} size='large' type='primary'>Spectral View</Button>
+                        {/*<Button onClick={() => getWaveLengthFunc()} size='large' type='primary'>Wave Leng</Button>
+                        <Button onClick={() => getSpectralViewFunc()} size='large' type='primary'>Spectral View</Button>*/}
                     </Space>
                 </Row>
 

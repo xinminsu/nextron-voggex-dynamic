@@ -1,18 +1,10 @@
-import React, { useState} from 'react';
+import React, {useState} from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
 import dgram from 'dgram'
 
-import {Col, Row, Select} from 'antd';
-
-import {
-  Layout,
-  Button,
-  Input,
-  Space,
-} from 'antd';
+import {Button, Col, Input, Layout, Row, Select, Space} from 'antd';
 import ReactECharts from "echarts-for-react";
-import {EmptyVoggexMessage, getVoggexMessageContent, MsgType, VoggexMessage} from "../msg/voggexMessage";
+import {getVoggexMessageContent, MsgType} from "../msg/voggexMessage";
 import {echartOption, selectOption} from "../prepare/homeData";
 import {string2ArrayBuffer, toHexString} from "../utils/strUtil";
 
@@ -28,8 +20,8 @@ function Home() {
 
     const [sendMsg, setSendMsg] = useState("");
     const [recvMsg, setRecvMsg] = useState("");
-
-    const [curMsg, setCurMsg ] = useState(EmptyVoggexMessage);
+    const [outputMsg, setOutputMsg] = useState("");
+    const [curMsg, setCurMsg ] = useState(MsgType.None);
 
     const socket = dgram.createSocket('udp4');
 
@@ -69,16 +61,19 @@ function Home() {
     const getWaveLengthFunc: () => void = () => {
         let cmdMsg = "30 02 06 00 00 00";
         let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
+        setCurMsg(MsgType.WaveLength);
         socket.send(smsg, 8080, '192.168.0.80');
     }
 
     const getSpectralWiewFunc: () => void = () => {
         let cmdMsg = "30 07 06 00 00 07";
         let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
+        setCurMsg(MsgType.SpectralView);
         socket.send(smsg, 8080, '192.168.0.80');
     }
 
     const handleChange = (value: MsgType) => {
+        setCurMsg(value);
         setSendMsg(getVoggexMessageContent(value));
     };
 
@@ -138,6 +133,11 @@ function Home() {
 
                     </Col>
                 </Row>
+
+                <br/>
+                <br/>
+
+                <TextArea rows={2} value={outputMsg}/>
 
                 <br/>
                 <br/>

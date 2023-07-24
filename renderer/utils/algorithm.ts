@@ -25,7 +25,7 @@ export const getWaveLengthInfo = (recvData: Uint8Array): string => {
     let result:string = '';
     for (let i = 0; i < 8; i++)
     {
-        result += '通道'+ (i+1) + ": " + wlData[i][0] + ' ';
+        result += '通道'+ (i+1) + ": " + wlData[i][0].toFixed(3) + ' ';
     }
 
     return result

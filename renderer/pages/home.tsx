@@ -65,6 +65,7 @@ function Home() {
 
     const clearFunc: () => void = () => {
         setRecvMsg('');
+        setOutputMsg('');
     }
 
     const startFunc: () => void = () => {

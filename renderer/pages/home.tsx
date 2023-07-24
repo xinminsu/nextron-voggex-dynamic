@@ -5,8 +5,9 @@ import dgram from 'dgram'
 import {Button, Col, Input, Layout, Row, Select, Space} from 'antd';
 import ReactECharts from "echarts-for-react";
 import {getVoggexMessageContent, MsgType} from "../msg/voggexMessage";
-import {echartOption, selectOption} from "../prepare/homeData";
+import {echartOption, selectOption} from "../preload/homeData";
 import {string2ArrayBuffer, toHexString} from "../utils/strUtil";
+import {getWaveLengthInfo} from "../utils/algorithm";
 
 const { TextArea } = Input;
 
@@ -31,11 +32,14 @@ function Home() {
     let rawTotalBuffer: Buffer = new Buffer('');
 
     socket.on('message', (msg, rinfo) => {
-        console.log("recv msg length is " + msg.length);
+        //console.log("recv msg length is " + msg.length);
         rawTotalBuffer = Buffer.concat([rawTotalBuffer, msg]);
         let rawBufferU8A:Uint8Array = new Uint8Array(rawTotalBuffer);
         let rawTotalMsg = toHexString(rawBufferU8A);
-        console.log("recv raw hex msg length is " + rawTotalMsg.length);
+        //console.log("recv raw hex msg length is " + rawTotalMsg.length);
+        if (curMsg == MsgType.WaveLength && rawTotalMsg.length == 3624) {
+            setOutputMsg(getWaveLengthInfo(rawBufferU8A));
+        }
         setRecvMsg(rawTotalMsg);
     });
 

@@ -24,6 +24,8 @@ const {
 
 function Home() {
 
+    const echartRef =  useRef(null);
+
     const [sendMsg, setSendMsg] = useState("");
     const [recvMsg, setRecvMsg] = useState("");
     const [outputMsg, setOutputMsg] = useState("");
@@ -53,9 +55,7 @@ function Home() {
         }
         setRecvMsg(rawTotalMsg);
     });
-
-    const echartRef =  useRef(null);;
-
+    
     const sendFunc = () => {
         if (sendMsg) {
             let smsg = string2ArrayBuffer(sendMsg.replaceAll(" ", ""));
@@ -158,7 +158,7 @@ function Home() {
                 <TextArea rows={2} value={outputMsg}/>
 
             </Content>
-            
+
             <br/>
             <br/>
 

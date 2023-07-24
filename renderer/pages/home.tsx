@@ -36,13 +36,15 @@ function Home() {
     socket.bind(4567, "192.168.0.123", () => {
     });
 
-    let recvTotalMsg: string = '';
+    let rawTotalBuffer: Buffer = new Buffer('');
 
     socket.on('message', (msg, rinfo) => {
-        let buffer:Uint8Array = new Uint8Array(msg);
-        //console.log(`server got: ${buffer} from ${rinfo.address}:${rinfo.port}`);
-        recvTotalMsg += toHexString(buffer);
-        setRecvMsg(recvTotalMsg);
+        console.log("recv msg length is " + msg.length);
+        rawTotalBuffer = Buffer.concat([rawTotalBuffer, msg]);
+        let rawBufferU8A:Uint8Array = new Uint8Array(rawTotalBuffer);
+        let rawTotalMsg = toHexString(rawBufferU8A);
+        console.log("recv raw hex msg length is " + rawTotalMsg.length);
+        setRecvMsg(rawTotalMsg);
     });
 
     const sendFunc: () => void = () => {

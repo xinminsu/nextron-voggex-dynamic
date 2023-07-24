@@ -29,7 +29,7 @@ export const EmptyVoggexMessage: VoggexMessage = {
 
 export const SpectralViewVoggexMessage: VoggexMessage = {
     type: MsgType.SpectralView,
-    content: "30 07 06 00 00 07"
+    content: "30 07 06 00 00 00"
 };
 
 export const GainSettingsVoggexMessage: VoggexMessage = {
@@ -98,7 +98,7 @@ export const AutomatictuningGainVoggexMessage: VoggexMessage = {
 export const getVoggexMessageContent: (type: MsgType) => string = (type) => {
     switch (type) {
         case MsgType.SpectralView:
-            return "30 07 06 00 00 07";
+            return "30 07 06 00 00 00";
         case MsgType.GainSettings:
             return "20 03 06 07 80 04";
         case MsgType.ThresholdSettings:

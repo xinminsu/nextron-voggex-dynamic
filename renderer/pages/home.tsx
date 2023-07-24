@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import Head from 'next/head';
 import dgram from 'dgram'
 
@@ -6,8 +6,14 @@ import {Button, Col, Input, Layout, Row, Select, Space} from 'antd';
 import ReactECharts from "echarts-for-react";
 import {getVoggexMessageContent, MsgType} from "../msg/voggexMessage";
 import {echartOption, selectOption} from "../preload/homeData";
-import {string2ArrayBuffer, toHexString} from "../utils/strUtil";
-import {getWaveLengthInfo} from "../utils/algorithm";
+import {
+    ArraytoStringArray,
+    string2ArrayBuffer,
+    toHexString,
+    Uint8ArraytoNumberArray,
+} from "../utils/strUtil";
+import {generateAxis, getWaveLengthInfo} from "../utils/algorithm";
+import {localIP, localPort, remoteIP, remotePort} from "../utils/const";
 
 const { TextArea } = Input;
 
@@ -15,7 +21,6 @@ const {
   Header,
   Content,
 } = Layout;
-
 
 function Home() {
 
@@ -26,27 +31,35 @@ function Home() {
 
     const socket = dgram.createSocket('udp4');
 
-    socket.bind(4567, "192.168.0.123", () => {
+    socket.bind(localPort, localIP, () => {
     });
 
     let rawTotalBuffer: Buffer = new Buffer('');
 
     socket.on('message', (msg, rinfo) => {
-        //console.log("recv msg length is " + msg.length);
+
         rawTotalBuffer = Buffer.concat([rawTotalBuffer, msg]);
         let rawBufferU8A:Uint8Array = new Uint8Array(rawTotalBuffer);
         let rawTotalMsg = toHexString(rawBufferU8A);
-        //console.log("recv raw hex msg length is " + rawTotalMsg.length);
+        console.log("recv raw hex msg length is " + rawTotalMsg.length);
         if (curMsg == MsgType.WaveLength && rawTotalMsg.length == 3624) {
             setOutputMsg(getWaveLengthInfo(rawBufferU8A));
+        }
+        if (curMsg == MsgType.SpectralView && rawTotalMsg.length == 12303) {
+            echartOption.xAxis[0].data = ArraytoStringArray(generateAxis());
+            // @ts-ignore
+            echartOption.series[0].data = Uint8ArraytoNumberArray(rawBufferU8A);
+            echartRef.current.getEchartsInstance().setOption(echartOption);
         }
         setRecvMsg(rawTotalMsg);
     });
 
+    const echartRef =  useRef(null);;
+
     const sendFunc: () => void = () => {
         if (sendMsg) {
             let smsg = string2ArrayBuffer(sendMsg.replaceAll(" ", ""));
-            socket.send(smsg, 8080, '192.168.0.80');
+            socket.send(smsg, remotePort, remoteIP);
         }
     }
 
@@ -66,14 +79,14 @@ function Home() {
         let cmdMsg = "30 02 06 00 00 00";
         let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
         setCurMsg(MsgType.WaveLength);
-        socket.send(smsg, 8080, '192.168.0.80');
+        socket.send(smsg, remotePort, remoteIP);
     }
 
-    const getSpectralWiewFunc: () => void = () => {
-        let cmdMsg = "30 07 06 00 00 07";
+    const getSpectralViewFunc: () => void = () => {
+        let cmdMsg = "30 07 06 00 00 00";
         let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
         setCurMsg(MsgType.SpectralView);
-        socket.send(smsg, 8080, '192.168.0.80');
+        socket.send(smsg, remotePort, remoteIP);
     }
 
     const handleChange = (value: MsgType) => {
@@ -99,7 +112,7 @@ function Home() {
                         <Button onClick={() => startFunc()} size='large' type='primary'>Start</Button>
                         <Button onClick={() => closeFunc()} size='large' type='primary'>Close</Button>
                         <Button onClick={() => getWaveLengthFunc()} size='large' type='primary'>Wave Leng</Button>
-                        <Button onClick={() => getSpectralWiewFunc()} size='large' type='primary'>Spectral Wiew</Button>
+                        <Button onClick={() => getSpectralViewFunc()} size='large' type='primary'>Spectral View</Button>
                     </Space>
                 </Row>
 
@@ -146,9 +159,11 @@ function Home() {
                 <br/>
                 <br/>
 
-                <ReactECharts option={echartOption} />
-
             </Content>
+
+            <ReactECharts  ref={echartRef}
+                option={echartOption}
+                          style={{ height: '500px' }}/>
         </React.Fragment>
     );
 };

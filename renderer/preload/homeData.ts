@@ -1,4 +1,5 @@
 import {MsgType} from "../msg/voggexMessage";
+import {axisdata, seriesdata} from "./testData";
 
 export const selectOption = [
     { value: MsgType.None, label: 'None' },
@@ -19,7 +20,7 @@ export const selectOption = [
 ];
 
 const colors: string[] = ['#5470C6', '#EE6666'];
-export const echartOption = {
+export var echartOption = {
     color: colors,
     tooltip: {
         trigger: 'none',
@@ -56,7 +57,7 @@ export const echartOption = {
                 }
             },
             // prettier-ignore
-            data: ['2016-1', '2016-2', '2016-3', '2016-4', '2016-5', '2016-6', '2016-7', '2016-8', '2016-9', '2016-10', '2016-11', '2016-12']
+            data: []
         }
     ],
     yAxis: [
@@ -66,15 +67,13 @@ export const echartOption = {
     ],
     series: [
         {
-            name: 'Precipitation(2016)',
+            name: '光谱图',
             type: 'line',
             smooth: true,
             emphasis: {
                 focus: 'series'
             },
-            data: [
-                3.9, 5.9, 11.1, 18.7, 48.3, 69.2, 231.6, 46.6, 55.4, 18.4, 10.3, 0.7
-            ]
+            data: []
         }
     ]
 };

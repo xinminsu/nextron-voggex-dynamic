@@ -26,10 +26,11 @@ function Home() {
 
     const echartRef =  useRef(null);
 
-    const [sendMsg, setSendMsg] = useState("");
-    const [recvMsg, setRecvMsg] = useState("");
-    const [outputMsg, setOutputMsg] = useState("");
-    const [curMsg, setCurMsg ] = useState(MsgType.None);
+    let [sendMsg, setSendMsg] = useState("");
+    let [recvMsg, setRecvMsg] = useState("");
+    let [outputMsg, setOutputMsg] = useState("");
+    let [curMsg, setCurMsg ] = useState(MsgType.None);
+    let showWave = false;
 
     const socket = dgram.createSocket('udp4');
 
@@ -47,7 +48,7 @@ function Home() {
         if (curMsg == MsgType.WaveLength && rawTotalMsg.length == 3624) {
             setOutputMsg(getWaveLengthInfo(rawBufferU8A));
         }
-        if (curMsg == MsgType.SpectralView && rawTotalMsg.length == 12303) {
+        if ((showWave || curMsg == MsgType.SpectralView ) && rawTotalMsg.length == 12303) {
             echartOption.xAxis[0].data = ArraytoStringArray(generateAxis());
             // @ts-ignore
             echartOption.series[0].data = Uint8ArraytoNumberArray(rawBufferU8A);
@@ -55,7 +56,7 @@ function Home() {
         }
         setRecvMsg(rawTotalMsg);
     });
-    
+
     const sendFunc = () => {
         if (sendMsg) {
             let smsg = string2ArrayBuffer(sendMsg.replaceAll(" ", ""));
@@ -63,17 +64,20 @@ function Home() {
         }
     }
 
-    const clearFunc = () => {
+    const clearServer = () => {
         setRecvMsg('');
+    }
+
+    const clearOutput = () => {
         setOutputMsg('');
     }
 
     const startFunc= () => {
-
+        showWave = false;
     }
 
     const closeFunc = () => {
-
+        showWave = false;
     }
 
 /*    const getWaveLengthFunc = () => {
@@ -81,17 +85,18 @@ function Home() {
         let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
         setCurMsg(MsgType.WaveLength);
         socket.send(smsg, remotePort, remoteIP);
-    }
+    }*/
 
     const getSpectralViewFunc = () => {
         let cmdMsg = "30 07 06 00 00 00";
         let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
-        setCurMsg(MsgType.SpectralView);
+        showWave = true
         socket.send(smsg, remotePort, remoteIP);
-    }*/
+    }
 
     const handleChange = (value: MsgType) => {
         setCurMsg(value);
+        showWave = false;
         setSendMsg(getVoggexMessageContent(value));
     };
 
@@ -112,8 +117,8 @@ function Home() {
                     <Space size={16}>
                         <Button onClick={() => startFunc()} size='large' type='primary'>Start</Button>
                         <Button onClick={() => closeFunc()} size='large' type='primary'>Close</Button>
-                        {/*<Button onClick={() => getWaveLengthFunc()} size='large' type='primary'>Wave Leng</Button>
-                        <Button onClick={() => getSpectralViewFunc()} size='large' type='primary'>Spectral View</Button>*/}
+                        {/*<Button onClick={() => getWaveLengthFunc()} size='large' type='primary'>Wave Leng</Button>*/}
+                        <Button onClick={() => getSpectralViewFunc()} size='large' type='primary'>Spectral View</Button>
                     </Space>
                 </Row>
 
@@ -145,7 +150,7 @@ function Home() {
                         <br/>
                         <TextArea rows={8} value={recvMsg} onChange={e => setRecvMsg(e.target.value)}/>
                         <br/>
-                        <Button onClick={() => clearFunc()} size='large' type='primary'>
+                        <Button onClick={() => clearServer()} size='large' type='primary'>
                             Clear
                         </Button>
 
@@ -153,10 +158,14 @@ function Home() {
                 </Row>
 
                 <br/>
-                <br/>
-
-                <TextArea rows={2} value={outputMsg}/>
-
+                <Row>
+                    <Space size={16}>
+                        <TextArea rows={2} value={outputMsg} style={{ width: '500px' }}/>
+                        <Button onClick={() => clearOutput()} size='large' type='primary'>
+                            Clear
+                        </Button>
+                    </Space>
+                </Row>
             </Content>
 
             <br/>

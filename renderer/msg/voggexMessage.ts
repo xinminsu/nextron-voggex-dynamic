@@ -95,7 +95,7 @@ export const AutomatictuningGainVoggexMessage: VoggexMessage = {
     type: MsgType.AutomatictuningGain
 } as VoggexMessage;
 
-export const getVoggexMessageContent: (type: MsgType) => string = (type) => {
+export const getVoggexMessageContent = (type) => {
     switch (type) {
         case MsgType.SpectralView:
             return "30 07 06 00 00 00";
@@ -127,6 +127,41 @@ export const getVoggexMessageContent: (type: MsgType) => string = (type) => {
             return "30 05 06";
         default:
             return "";
+    }
+}
+
+export const checkNormalVoggexMessage  = (type) => {
+    switch (type) {
+        case MsgType.SpectralView:
+            return false;
+        case MsgType.GainSettings:
+            return true;
+        case MsgType.ThresholdSettings:
+            return true;
+        case MsgType.WaveLength:
+            return false;
+        case MsgType.ParameterSave:
+            return true;
+        case MsgType.VirtuaDataValidation:
+            return true;
+        case MsgType.ParameterReads:
+            return true;
+        case MsgType.IndividualWavelengthVerification:
+            return true;
+        case MsgType.Version:
+            return true;
+        case MsgType.AutomaticDebugging:
+            return true;
+        case MsgType.VirtualChannelReads:
+            return true;
+        case MsgType.ParameterReadsExpand:
+            return true;
+        case MsgType.IndividualWaveLength:
+            return true;
+        case MsgType.AutomatictuningGain:
+            return true;
+        default:
+            return true;
     }
 }
 

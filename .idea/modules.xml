@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/nextron-oneudp-ant.iml" filepath="$PROJECT_DIR$/.idea/nextron-oneudp-ant.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/nextron-voggex-dynamic.iml" filepath="$PROJECT_DIR$/.idea/nextron-voggex-dynamic.iml" />
     </modules>
   </component>
 </project>

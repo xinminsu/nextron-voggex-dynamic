@@ -1,21 +1,14 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef} from 'react';
 import Head from 'next/head';
 import dgram from 'dgram'
 
-import {Button, Col, Input, Layout, Row, Select, Space} from 'antd';
+import {Button, Layout, Row,  Space} from 'antd';
 import ReactECharts from "echarts-for-react";
-import {getVoggexMessageContent, MsgType} from "../msg/voggexMessage";
-import {echartOption, selectOption} from "../preload/homeData";
-import {
-    ArraytoStringArray,
-    string2ArrayBuffer,
-    toHexString,
-    Uint8ArraytoNumberArray,
-} from "../utils/strUtil";
-import {generateAxis, getWaveLengthInfo} from "../utils/algorithm";
-import {localIP, localPort, remoteIP, remotePort} from "../utils/const";
 
-const { TextArea } = Input;
+import {echartOption} from "../preload/homeData";
+import {ArraytoStringArray, string2ArrayBuffer, Uint8ArraytoNumberArray,} from "../utils/strUtil";
+import {generateAxis} from "../utils/algorithm";
+import {localIP, localPort, remoteIP, remotePort} from "../utils/const";
 
 const {
   Header,
@@ -26,151 +19,64 @@ function Home() {
 
     const echartRef =  useRef(null);
 
-    let [sendMsg, setSendMsg] = useState("");
-    let [recvMsg, setRecvMsg] = useState("");
-    let [outputMsg, setOutputMsg] = useState("");
-    let [curMsg, setCurMsg ] = useState(MsgType.None);
-    let showWave = false;
+    let showWaveIntervId;
 
     const socket = dgram.createSocket('udp4');
 
     socket.bind(localPort, localIP, () => {
     });
 
-    let rawTotalBuffer: Buffer = new Buffer('');
+    let rawTotalBuffer: Buffer = Buffer.alloc(0);
+    let rawBufferU8A:Uint8Array;
 
     socket.on('message', (msg, rinfo) => {
-
         rawTotalBuffer = Buffer.concat([rawTotalBuffer, msg]);
-        let rawBufferU8A:Uint8Array = new Uint8Array(rawTotalBuffer);
-        let rawTotalMsg = toHexString(rawBufferU8A);
+        rawBufferU8A = new Uint8Array(rawTotalBuffer);
         //console.log("recv raw hex msg length is " + rawTotalMsg.length);
-        if (curMsg == MsgType.WaveLength && rawTotalMsg.length == 3624) {
-            setOutputMsg(getWaveLengthInfo(rawBufferU8A));
-        }
-        if ((showWave || curMsg == MsgType.SpectralView ) && rawTotalMsg.length == 12303) {
+        if (showWaveIntervId && rawBufferU8A.length == 4101) {
             echartOption.xAxis[0].data = ArraytoStringArray(generateAxis());
-            // @ts-ignore
             echartOption.series[0].data = Uint8ArraytoNumberArray(rawBufferU8A);
             echartRef.current.getEchartsInstance().setOption(echartOption);
+            rawTotalBuffer = Buffer.alloc(0);
         }
-        setRecvMsg(rawTotalMsg);
     });
 
-    const sendFunc = () => {
-        if (sendMsg) {
-            let smsg = string2ArrayBuffer(sendMsg.replaceAll(" ", ""));
-            socket.send(smsg, remotePort, remoteIP);
-        }
+    const stopShowWave = () => {
+        clearInterval(showWaveIntervId);
+        showWaveIntervId = 0;
+        echartOption.xAxis[0].data = [];
+        echartOption.series[0].data = [];
+        echartRef.current.getEchartsInstance().setOption(echartOption);
     }
-
-    const clearServer = () => {
-        setRecvMsg('');
-    }
-
-    const clearOutput = () => {
-        setOutputMsg('');
-    }
-
-    const startFunc= () => {
-        showWave = false;
-    }
-
-    const closeFunc = () => {
-        showWave = false;
-    }
-
-/*    const getWaveLengthFunc = () => {
-        let cmdMsg = "30 02 06 00 00 00";
-        let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
-        setCurMsg(MsgType.WaveLength);
-        socket.send(smsg, remotePort, remoteIP);
-    }*/
 
     const getSpectralViewFunc = () => {
         let cmdMsg = "30 07 06 00 00 00";
         let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
-        showWave = true
-        socket.send(smsg, remotePort, remoteIP);
+        if(!showWaveIntervId){
+            showWaveIntervId = setInterval(
+                () => {
+                    if(showWaveIntervId)
+                        socket.send(smsg, remotePort, remoteIP);
+                }, 4000);
+        }
     }
-
-    const handleChange = (value: MsgType) => {
-        setCurMsg(value);
-        showWave = false;
-        setSendMsg(getVoggexMessageContent(value));
-    };
 
     return (
         <React.Fragment>
             <Head>
-                <title>Voggex</title>
+                <title>Voggex dynamic</title>
             </Head>
-
-{/*            <Header>
-                <Link href="/next">
-                    <a>Go to wave page</a>
-                </Link>
-            </Header>*/}
 
             <Content style={{padding: 48}}>
                 <Row>
                     <Space size={16}>
-                        <Button onClick={() => startFunc()} size='large' type='primary'>Start</Button>
-                        <Button onClick={() => closeFunc()} size='large' type='primary'>Close</Button>
-                        {/*<Button onClick={() => getWaveLengthFunc()} size='large' type='primary'>Wave Leng</Button>*/}
                         <Button onClick={() => getSpectralViewFunc()} size='large' type='primary'>Spectral View</Button>
-                    </Space>
-                </Row>
-
-                <br/>
-                <br/>
-                <Row>
-                    <Col span={12}>
-                        <label>Client:</label>
-                        <br/>
-                        <Space wrap>
-                            <Select
-                                defaultValue ={MsgType.None}
-                                style={{ width: 200 }}
-                                onChange={handleChange}
-                                options={selectOption}
-                            />
-                        </Space>
-                        <TextArea rows={4} value={sendMsg}
-                                  onChange={e => setSendMsg(e.target.value)}/>
-                        <br/>
-
-                        <Button onClick={() => sendFunc()} size='large' type='primary'>
-                            Send
-                        </Button>
-
-                    </Col>
-                    <Col span={12}>
-                        <label>Server:</label>
-                        <br/>
-                        <TextArea rows={8} value={recvMsg} onChange={e => setRecvMsg(e.target.value)}/>
-                        <br/>
-                        <Button onClick={() => clearServer()} size='large' type='primary'>
-                            Clear
-                        </Button>
-
-                    </Col>
-                </Row>
-
-                <br/>
-                <Row>
-                    <Space size={16}>
-                        <TextArea rows={2} value={outputMsg} style={{ width: '500px' }}/>
-                        <Button onClick={() => clearOutput()} size='large' type='primary'>
-                            Clear
-                        </Button>
+                        <Button onClick={() => stopShowWave()} size='large' type='primary'>Stop</Button>
                     </Space>
                 </Row>
             </Content>
 
             <br/>
-            <br/>
-
             <ReactECharts  ref={echartRef}
                 option={echartOption}
                           style={{ height: '500px' }}/>

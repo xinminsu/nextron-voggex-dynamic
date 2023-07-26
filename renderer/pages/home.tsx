@@ -1,16 +1,14 @@
+import electron from 'electron';
 import React, {useRef, useState} from 'react';
 import Head from 'next/head';
-import dgram from 'dgram'
-
 import {Button, Input, Layout, Row,  Space} from 'antd';
 import ReactECharts from "echarts-for-react";
 
 import {echartOption} from "../preload/homeData";
-import {ArraytoStringArray, string2ArrayBuffer, Uint8ArraytoNumberArray,} from "../utils/strUtil";
-import {generateAxis, getWaveLengthInfo} from "../utils/algorithm";
-import {localIP, localPort, remoteIP, remotePort} from "../utils/const";
 
 const { TextArea } = Input;
+
+const ipcRenderer = electron.ipcRenderer || false;
 
 const {
   Header,
@@ -22,60 +20,42 @@ function Home() {
     const echartRef =  useRef(null);
     let [outputMsg, setOutputMsg] = useState("");
 
-    let showWaveIntervId;
+    React.useEffect(() => {
 
-    const socket = dgram.createSocket('udp4');
-
-    socket.bind(localPort, localIP, () => {
-    });
-
-    let rawTotalBuffer: Buffer = Buffer.alloc(0);
-    let rawBufferU8A:Uint8Array;
-
-    socket.on('message', (msg, rinfo) => {
-        rawTotalBuffer = Buffer.concat([rawTotalBuffer, msg]);
-        rawBufferU8A = new Uint8Array(rawTotalBuffer);
-        //console.log("recv raw hex msg length is " + rawTotalMsg.length);
-        if (rawBufferU8A.length == 1208) {
-            setOutputMsg(getWaveLengthInfo(rawBufferU8A));
-            rawTotalBuffer = Buffer.alloc(0);;
-        }
-        if (showWaveIntervId && rawBufferU8A.length == 4101) {
-            echartOption.xAxis[0].data = ArraytoStringArray(generateAxis());
-            echartOption.series[0].data = Uint8ArraytoNumberArray(rawBufferU8A);
+        ipcRenderer && ipcRenderer.on('spectral-view-show', (event, data) => {
+            echartOption.xAxis[0].data = JSON.parse(data).content[0];
+            echartOption.series[0].data = JSON.parse(data).content[1];
             echartRef.current.getEchartsInstance().setOption(echartOption);
-            rawTotalBuffer = Buffer.alloc(0);
-        }
-    });
+        });
+
+        ipcRenderer && ipcRenderer.on('wave-length-show', (event, data) => {
+            setOutputMsg(data);
+        });
+
+        return () => {
+            ipcRenderer &&  ipcRenderer.removeAllListeners('spectral-view-show');
+            ipcRenderer &&  ipcRenderer.removeAllListeners('wave-length-show');
+        };
+    }, []);
 
     const clearOutput = () => {
         setOutputMsg('');
     }
 
     const stopShowWave = () => {
-        clearInterval(showWaveIntervId);
-        showWaveIntervId = 0;
+        ipcRenderer && ipcRenderer.send('spectral-view-stop', '');
+
         echartOption.xAxis[0].data = [];
         echartOption.series[0].data = [];
         echartRef.current.getEchartsInstance().setOption(echartOption);
     }
 
     const spectralView = () => {
-        let cmdMsg = "30 07 06 00 00 00";
-        let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
-        if(!showWaveIntervId){
-            showWaveIntervId = setInterval(
-                () => {
-                    if(showWaveIntervId)
-                        socket.send(smsg, remotePort, remoteIP);
-                }, 4000);
-        }
+        ipcRenderer && ipcRenderer.send('spectral-view-start', '');
     }
 
     const waveLength = () => {
-        let cmdMsg = "30 02 06 00 00 00";
-        let smsg = string2ArrayBuffer(cmdMsg.replaceAll(" ", ""));
-        socket.send(smsg, remotePort, remoteIP);
+        ipcRenderer && ipcRenderer.send('get-wave-length', '');
     }
 
     return (
@@ -92,7 +72,8 @@ function Home() {
                         <Button onClick={() => waveLength()} size='large' type='primary'>Wave length</Button>
                     </Space>
                 </Row>
-
+                <br/>
+                <br/>
                 <Row>
                     <Space size={16}>
                         <TextArea rows={2} value={outputMsg} style={{ width: '500px' }}/>

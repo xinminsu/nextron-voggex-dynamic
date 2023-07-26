@@ -1,23 +1,4 @@
-import {MsgType} from "../msg/voggexMessage";
 import {axisdata, seriesdata} from "./testData";
-
-export const selectOption = [
-    { value: MsgType.None, label: 'None' },
-    { value: MsgType.SpectralView, label: 'SpectralView' },
-    { value: MsgType.GainSettings, label: 'GainSettings' },
-    { value: MsgType.ThresholdSettings, label: 'ThresholdSettings' },
-    { value: MsgType.WaveLength, label: 'WaveLength'},
-    { value: MsgType.ParameterSave, label: 'ParameterSave' },
-    { value: MsgType.VirtuaDataValidation, label: 'VirtuaDataValidation' },
-    { value: MsgType.ParameterReads, label: 'ParameterReads' },
-    { value: MsgType.IndividualWavelengthVerification, label: 'IndividualWavelengthVerification'},
-    { value: MsgType.Version, label: 'Version' },
-    { value: MsgType.AutomaticDebugging, label: 'AutomaticDebugging' },
-    { value: MsgType.VirtualChannelReads, label: 'VirtualChannelReads' },
-    { value: MsgType.ParameterReadsExpand, label: 'ParameterReadsExpand'},
-    { value: MsgType.IndividualWaveLength, label: 'IndividualWaveLength' },
-    { value: MsgType.AutomatictuningGain, label: 'AutomatictuningGain' },
-];
 
 const colors: string[] = ['#5470C6', '#EE6666'];
 export var echartOption = {

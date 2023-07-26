@@ -19,6 +19,9 @@ function Home() {
 
     const echartRef =  useRef(null);
     let [outputMsg, setOutputMsg] = useState("");
+    let [spvwDisabled, setSpvwDisabled] = useState(false);
+    let [lengthDisabled, setLengthDisabled] = useState(false);
+    let [stopDisabled, setStopDisabled] = useState(true);
 
     React.useEffect(() => {
 
@@ -30,6 +33,7 @@ function Home() {
 
         ipcRenderer && ipcRenderer.on('wave-length-show', (event, data) => {
             setOutputMsg(data);
+            setSpvwDisabled(false);
         });
 
         return () => {
@@ -43,6 +47,10 @@ function Home() {
     }
 
     const stopShowWave = () => {
+        setStopDisabled(true);
+        setSpvwDisabled(false);
+        setLengthDisabled(false);
+
         ipcRenderer && ipcRenderer.send('spectral-view-stop', '');
 
         echartOption.xAxis[0].data = [];
@@ -51,10 +59,14 @@ function Home() {
     }
 
     const spectralView = () => {
+        setStopDisabled(false);
+        setSpvwDisabled(true);
+        setLengthDisabled(true);
         ipcRenderer && ipcRenderer.send('spectral-view-start', '');
     }
 
     const waveLength = () => {
+        setSpvwDisabled(true);
         ipcRenderer && ipcRenderer.send('get-wave-length', '');
     }
 
@@ -67,9 +79,9 @@ function Home() {
             <Content style={{padding: 48}}>
                 <Row>
                     <Space size={16}>
-                        <Button onClick={() => spectralView()} size='large' type='primary'>Spectral View</Button>
-                        <Button onClick={() => stopShowWave()} size='large' type='primary'>Stop</Button>
-                        <Button onClick={() => waveLength()} size='large' type='primary'>Wave length</Button>
+                        <Button disabled={spvwDisabled} onClick={() => spectralView()} size='large' type='primary'>Spectral View</Button>
+                        <Button disabled={stopDisabled} onClick={() => stopShowWave()} size='large' type='primary'>Stop</Button>
+                        <Button disabled={lengthDisabled} onClick={() => waveLength()} size='large' type='primary'>Wave length</Button>
                     </Space>
                 </Row>
                 <br/>

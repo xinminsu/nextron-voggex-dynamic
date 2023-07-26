@@ -8,7 +8,7 @@ import {echartOption} from "../preload/homeData";
 
 const { TextArea } = Input;
 
-const ipcRenderer = electron.ipcRenderer || false;
+const ipcRenderer = electron.ipcRenderer;
 
 const {
   Header,
@@ -25,20 +25,20 @@ function Home() {
 
     React.useEffect(() => {
 
-        ipcRenderer && ipcRenderer.on('spectral-view-show', (event, data) => {
+        ipcRenderer.on('spectral-view-show', (event, data) => {
             echartOption.xAxis[0].data = JSON.parse(data).content[0];
             echartOption.series[0].data = JSON.parse(data).content[1];
             echartRef.current.getEchartsInstance().setOption(echartOption);
         });
 
-        ipcRenderer && ipcRenderer.on('wave-length-show', (event, data) => {
+        ipcRenderer.on('wave-length-show', (event, data) => {
             setOutputMsg(data);
             setSpvwDisabled(false);
         });
 
         return () => {
-            ipcRenderer &&  ipcRenderer.removeAllListeners('spectral-view-show');
-            ipcRenderer &&  ipcRenderer.removeAllListeners('wave-length-show');
+            ipcRenderer.removeAllListeners('spectral-view-show');
+            ipcRenderer.removeAllListeners('wave-length-show');
         };
     }, []);
 
@@ -62,12 +62,12 @@ function Home() {
         setStopDisabled(false);
         setSpvwDisabled(true);
         setLengthDisabled(true);
-        ipcRenderer && ipcRenderer.send('spectral-view-start', '');
+        ipcRenderer.send('spectral-view-start', '');
     }
 
     const waveLength = () => {
         setSpvwDisabled(true);
-        ipcRenderer && ipcRenderer.send('get-wave-length', '');
+        ipcRenderer.send('get-wave-length', '');
     }
 
     return (

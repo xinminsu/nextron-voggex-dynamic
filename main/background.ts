@@ -34,8 +34,6 @@ const waveLengStringMsg = "30 02 06 00 00 00";
 const waveLengMsg = string2ArrayBuffer(waveLengStringMsg.replaceAll(" ", ""));
 let showWaveIntervId;
 
-let renderEvent;
-
 (async () => {
   await app.whenReady();
 
@@ -74,6 +72,7 @@ let renderEvent;
 })();
 
 app.on('window-all-closed', () => {
+  udpSocket.close();
   app.quit();
 });
 

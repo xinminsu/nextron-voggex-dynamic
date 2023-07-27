@@ -18,7 +18,7 @@ let udpSocket;
 const createSocket = () => {
   const socket = dgram.createSocket('udp4');
   return new Promise((resolve, reject) => {
-    socket.bind(localPort, localIP, () => {
+    socket.bind(localPort, () => {
       udpSocket = socket;
       resolve(socket);
     });

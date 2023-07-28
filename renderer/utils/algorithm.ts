@@ -1,4 +1,3 @@
-
 export const getWaveLengthInfo = (recvData: Uint8Array): string => {
     let m: number = 8;
     let wlData: number[][] = [];
@@ -29,13 +28,4 @@ export const getWaveLengthInfo = (recvData: Uint8Array): string => {
     }
 
     return result
-}
-
-export const generateAxis = (): Array<any> => {
-    let axis = new Array(4101);
-    for (let i = 0; i < 4101; i++)
-    {
-        axis[i] = 1527 + i * 0.01;
-    }
-    return axis;
 }

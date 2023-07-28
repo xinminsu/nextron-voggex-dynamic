@@ -1,10 +1,12 @@
 import electron from 'electron';
 import React, {useRef, useState} from 'react';
 import Head from 'next/head';
-import {Button, Input, Layout, Row,  Space} from 'antd';
-import ReactECharts from "echarts-for-react";
 
-import {echartOption} from "../preload/homeData";
+import {Button, Col, Input, Layout, Row, Select, Space} from 'antd';
+import ReactECharts from "echarts-for-react";
+import {getVoggexMessageContent, MsgType} from "../msg/voggexMessage";
+import {echartOption, selectOption} from "../preload/homeData";
+import {getWaveLengthInfo} from "../utils/algorithm";
 
 const { TextArea } = Input;
 
@@ -18,88 +20,116 @@ const {
 function Home() {
 
     const echartRef =  useRef(null);
+
+    let [sendMsg, setSendMsg] = useState("");
+    let [recvMsg, setRecvMsg] = useState("");
     let [outputMsg, setOutputMsg] = useState("");
-    let [spvwDisabled, setSpvwDisabled] = useState(false);
-    let [lengthDisabled, setLengthDisabled] = useState(false);
-    let [stopDisabled, setStopDisabled] = useState(true);
+    let [curMsg, setCurMsg ] = useState(MsgType.None);
 
     React.useEffect(() => {
 
         ipcRenderer.on('spectral-view-show', (event, data) => {
             echartOption.xAxis[0].data = JSON.parse(data).content[0];
-            let ydata = JSON.parse(data).content[1].map(x => x == 0 ? 0.5: x).map(x => 10 * Math.log10(x/2500000));
-            // @ts-ignore
-            echartOption.yAxis[0].min = Math.min(...ydata).toFixed(3) ;
-            // @ts-ignore
-            echartOption.yAxis[0].max = Math.max(...ydata).toFixed(3) ;
-            echartOption.series[0].data = ydata;
+            echartOption.series[0].data = JSON.parse(data).content[1];
             echartRef.current.getEchartsInstance().setOption(echartOption);
         });
 
         ipcRenderer.on('wave-length-show', (event, data) => {
             setOutputMsg(data);
-            setSpvwDisabled(false);
+        });
+
+        ipcRenderer.on('normal-result', (event, data) => {
+            setRecvMsg(data);
         });
 
         return () => {
             ipcRenderer.removeAllListeners('spectral-view-show');
-            ipcRenderer.removeAllListeners('wave-length-show');
+            ipcRenderer.removeAllListeners('normal-result');
         };
     }, []);
+
+    const clearServer = () => {
+        setRecvMsg('');
+    }
 
     const clearOutput = () => {
         setOutputMsg('');
     }
-
-    const stopShowWave = () => {
-        setStopDisabled(true);
-        setSpvwDisabled(false);
-        setLengthDisabled(false);
-
-        ipcRenderer && ipcRenderer.send('spectral-view-stop', '');
-
-        echartOption.xAxis[0].data = [];
-        echartOption.series[0].data = [];
-        echartRef.current.getEchartsInstance().setOption(echartOption);
+    const sendFunc = () => {
+        if (sendMsg) {
+            ipcRenderer.send('udp-send', sendMsg);
+        }
     }
 
     const spectralView = () => {
-        setStopDisabled(false);
-        setSpvwDisabled(true);
-        setLengthDisabled(true);
         ipcRenderer.send('spectral-view-start', '');
     }
 
-    const waveLength = () => {
-        setSpvwDisabled(true);
-        ipcRenderer.send('get-wave-length', '');
-    }
+    const handleChange = (value: MsgType) => {
+        setCurMsg(value);
+        setSendMsg(getVoggexMessageContent(value));
+    };
 
     return (
         <React.Fragment>
             <Head>
-                <title>Voggex dynamic</title>
+                <title>Voggex</title>
             </Head>
-
+            
             <Content style={{padding: 48}}>
                 <Row>
-                    <Space size={16}>
-                        <Button disabled={spvwDisabled} onClick={() => spectralView()} size='large' type='primary'>Spectral View</Button>
-                        <Button disabled={stopDisabled} onClick={() => stopShowWave()} size='large' type='primary'>Stop</Button>
-                        <Button disabled={lengthDisabled} onClick={() => waveLength()} size='large' type='primary'>Wave length</Button>
-                    </Space>
+                    <Col span={12}>
+                        <label>Client:</label>
+                        <br/>
+                        <Space wrap>
+                            <Select
+                                defaultValue ={MsgType.None}
+                                style={{ width: 200 }}
+                                onChange={handleChange}
+                                options={selectOption}
+                            />
+                        </Space>
+                        <TextArea rows={4} value={sendMsg}
+                                  onChange={e => setSendMsg(e.target.value)}/>
+                        <br/>
+
+                        <Button onClick={() => sendFunc()} size='large' type='primary'>
+                            Send
+                        </Button>
+
+                    </Col>
+                    <Col span={12}>
+                        <label>Server:</label>
+                        <br/>
+                        <TextArea rows={8} value={recvMsg} onChange={e => setRecvMsg(e.target.value)}/>
+                        <br/>
+                        <Button onClick={() => clearServer()} size='large' type='primary'>
+                            Clear
+                        </Button>
+
+                    </Col>
                 </Row>
-                <br/>
+
                 <br/>
                 <Row>
                     <Space size={16}>
-                        <TextArea rows={4} value={outputMsg} style={{ width: '800px' }}/>
+                        <TextArea rows={2} value={outputMsg} style={{ width: '500px' }}/>
                         <Button onClick={() => clearOutput()} size='large' type='primary'>
                             Clear
                         </Button>
                     </Space>
                 </Row>
+
+                <br/>
+                <br/>
+
+                <Row>
+                    <Space size={16}>
+                        <Button onClick={() => spectralView()} size='large' type='primary'>Spectral View</Button>
+                    </Space>
+                </Row>
             </Content>
+
 
             <br/>
             <ReactECharts  ref={echartRef}

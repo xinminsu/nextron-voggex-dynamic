@@ -1,9 +1,9 @@
 {
   "private": true,
-  "name": "nextron-voggex-dynamic",
-  "description": "Voggex dynamic",
+  "name": "nextron-voggex",
+  "description": "voggex application",
   "version": "1.0.0",
-  "author": "xinmin su<sinosu@163.com>",
+  "author": "xinminsu <sinosu@163.com>",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",

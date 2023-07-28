@@ -18,7 +18,7 @@ export const ArraytoStringArray = (bytes: Array<any>): string[] => {
 }
 
 export const Uint8ArraytoNumberArray = (bytes: Uint8Array): any[] => {
-    var data = [];
+    var data = new Array();
 
     for (var i = 0; i < bytes.length; ++i) {
         data.push(bytes[i]);

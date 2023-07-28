@@ -27,7 +27,12 @@ function Home() {
 
         ipcRenderer.on('spectral-view-show', (event, data) => {
             echartOption.xAxis[0].data = JSON.parse(data).content[0];
-            echartOption.series[0].data = JSON.parse(data).content[1].map(x => 10 * Math.log10(x/2500000)).map(x => x < -80 ? -80: x);
+            let ydata = JSON.parse(data).content[1].map(x => x == 0 ? 0.5: x).map(x => 10 * Math.log10(x/2500000));
+            // @ts-ignore
+            echartOption.yAxis[0].min = Math.min(...ydata).toFixed(3) ;
+            // @ts-ignore
+            echartOption.yAxis[0].max = Math.max(...ydata).toFixed(3) ;
+            echartOption.series[0].data = ydata;
             echartRef.current.getEchartsInstance().setOption(echartOption);
         });
 
@@ -88,7 +93,7 @@ function Home() {
                 <br/>
                 <Row>
                     <Space size={16}>
-                        <TextArea rows={2} value={outputMsg} style={{ width: '500px' }}/>
+                        <TextArea rows={4} value={outputMsg} style={{ width: '800px' }}/>
                         <Button onClick={() => clearOutput()} size='large' type='primary'>
                             Clear
                         </Button>

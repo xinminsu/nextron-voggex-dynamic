@@ -32,7 +32,8 @@ const spvwMsg = string2ArrayBuffer(spvwStringMsg.replaceAll(" ", ""));
 
 const waveLengStringMsg = "30 02 06 00 00 00";
 const waveLengMsg = string2ArrayBuffer(waveLengStringMsg.replaceAll(" ", ""));
-let showWaveIntervId;
+
+let waveContinue = false;
 
 (async () => {
   await app.whenReady();
@@ -62,8 +63,11 @@ let showWaveIntervId;
       rawTotalBuffer = Buffer.alloc(0);
     }
     if ( rawBufferU8A.length == 4101) {
-      mainWindow.webContents.send("spectral-view-show",
-          `{"content":[[${ArraytoStringArray(generateAxis())}],[${Uint8ArraytoNumberArray(rawBufferU8A)}]]}`);
+      if(waveContinue){
+        mainWindow.webContents.send("spectral-view-show",
+            `{"content":[[${ArraytoStringArray(generateAxis())}],[${Uint8ArraytoNumberArray(rawBufferU8A)}]]}`);
+        udpSocket.send(spvwMsg, remotePort, remoteIP);
+      }
       rawTotalBuffer = Buffer.alloc(0);
     }
   });
@@ -77,18 +81,12 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('spectral-view-start', (event, arg) => {
-  if(!showWaveIntervId){
-    showWaveIntervId = setInterval(
-        () => {
-          if(showWaveIntervId)
-            udpSocket.send(spvwMsg, remotePort, remoteIP);
-        }, 4000);
-  }
+  waveContinue = true;
+  udpSocket.send(spvwMsg, remotePort, remoteIP);
 });
 
 ipcMain.on('spectral-view-stop', (event, arg) => {
-  clearInterval(showWaveIntervId);
-  showWaveIntervId = null;
+  waveContinue = false;
 });
 
 ipcMain.on('get-wave-length', (event, arg) => {

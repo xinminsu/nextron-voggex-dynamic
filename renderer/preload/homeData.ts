@@ -47,8 +47,8 @@ export var echartOption = {
             axisLabel: {
                 formatter: '{value} db'
             },
-            min: -80,
-            max: -20,
+            min: -60,
+            max: -40,
         }
     ],
     series: [

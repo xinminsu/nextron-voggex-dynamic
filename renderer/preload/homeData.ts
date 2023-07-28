@@ -43,7 +43,12 @@ export var echartOption = {
     ],
     yAxis: [
         {
-            type: 'value'
+            type: 'value',
+            axisLabel: {
+                formatter: '{value} db'
+            },
+            min: -80,
+            max: -20,
         }
     ],
     series: [

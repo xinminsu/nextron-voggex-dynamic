@@ -27,7 +27,7 @@ function Home() {
 
         ipcRenderer.on('spectral-view-show', (event, data) => {
             echartOption.xAxis[0].data = JSON.parse(data).content[0];
-            echartOption.series[0].data = JSON.parse(data).content[1];
+            echartOption.series[0].data = JSON.parse(data).content[1].map(x => 10 * Math.log10(x/2500000)).map(x => x < -80 ? -80: x);
             echartRef.current.getEchartsInstance().setOption(echartOption);
         });
 

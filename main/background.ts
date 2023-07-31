@@ -5,6 +5,7 @@ import dgram from 'dgram';
 import {localPort, remoteIP, remotePort} from "./utils/const";
 import {generateAxis, getWaveLengthInfo} from "./utils/algorithm";
 import {ArraytoStringArray, string2ArrayBuffer, Uint8ArraytoNumberArray} from "./utils/strUtil";
+import {spvwMsg, spvwStringMsg, spvwStringMsgArray, waveLengthMsg} from "./message/voggexMessage";
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
 
@@ -27,14 +28,10 @@ const createSocket = () => {
 let rawTotalBuffer: Buffer = Buffer.alloc(0);
 let rawBufferU8A:Uint8Array;
 
-const spvwStringMsg = "30 07 06 00 00 00";
-const spvwMsg = string2ArrayBuffer(spvwStringMsg.replaceAll(" ", ""));
-
-const waveLengthStringMsg = "30 02 06 00 00 00";
-const waveLengthMsg = string2ArrayBuffer(waveLengthStringMsg.replaceAll(" ", ""));
-
 let spectralViewContinue = false;
 let waveLengthContinue = false;
+
+let curChannel = 0;
 
 (async () => {
   await app.whenReady();
@@ -69,8 +66,11 @@ let waveLengthContinue = false;
     if ( rawBufferU8A.length == 4101) {
       if(spectralViewContinue){
         mainWindow.webContents.send("spectral-view-show",
-            `{"content":[[${ArraytoStringArray(generateAxis())}],[${Uint8ArraytoNumberArray(rawBufferU8A)}]]}`);
-        udpSocket.send(spvwMsg, remotePort, remoteIP);
+            `{"channelId":${curChannel},"content":[[${ArraytoStringArray(generateAxis())}],[${Uint8ArraytoNumberArray(rawBufferU8A)}]]}`);
+        curChannel ++;
+        curChannel = curChannel % 4;
+        let curSpvwMsg = string2ArrayBuffer(spvwStringMsgArray[curChannel].replaceAll(" ", ""));
+        udpSocket.send(curSpvwMsg, remotePort, remoteIP);
       }
       rawTotalBuffer = Buffer.alloc(0);
     }

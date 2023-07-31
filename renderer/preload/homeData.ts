@@ -63,3 +63,9 @@ export var echartOption = {
         }
     ]
 };
+
+export var echart1Option = Object.assign({}, echartOption);
+export var echart2Option = Object.assign({}, echartOption);
+export var echart3Option = Object.assign({}, echartOption);
+
+export var echartOptionArray = [echartOption, echart1Option, echart2Option, echart3Option];

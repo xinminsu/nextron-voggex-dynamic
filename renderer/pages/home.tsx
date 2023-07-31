@@ -1,10 +1,10 @@
 import electron from 'electron';
 import React, {useRef, useState} from 'react';
 import Head from 'next/head';
-import {Button, Input, Layout, Row,  Space} from 'antd';
+import {Button, Input, Layout, Row, Space} from 'antd';
 import ReactECharts from "echarts-for-react";
 
-import {echartOption} from "../preload/homeData";
+import {echart1Option, echart2Option, echart3Option, echartOption, echartOptionArray} from "../preload/homeData";
 
 const { TextArea } = Input;
 
@@ -17,7 +17,12 @@ const {
 
 function Home() {
 
-    const echartRef =  useRef(null);
+    const echartRef0 =  useRef(null);
+    const echartRef1 =  useRef(null);
+    const echartRef2 =  useRef(null);
+    const echartRef3 =  useRef(null);
+    const echartRefArray = [echartRef0, echartRef1, echartRef2, echartRef3];
+
     let [outputMsg, setOutputMsg] = useState("");
     let [spvwDisabled, setSpvwDisabled] = useState(false);
     let [lengthDisabled, setLengthDisabled] = useState(false);
@@ -26,14 +31,8 @@ function Home() {
     React.useEffect(() => {
 
         ipcRenderer.on('spectral-view-show', (event, data) => {
-            echartOption.xAxis[0].data = JSON.parse(data).content[0];
-            let ydata = JSON.parse(data).content[1].map(x => x == 0 ? 0.5: x).map(x => 10 * Math.log10(x/2500000));
-            // @ts-ignore
-            echartOption.yAxis[0].min = Math.min(...ydata).toFixed(5) ;
-            // @ts-ignore
-            echartOption.yAxis[0].max = Math.max(...ydata).toFixed(5) ;
-            echartOption.series[0].data = ydata;
-            echartRef.current.getEchartsInstance().setOption(echartOption);
+            let channelId = JSON.parse(data).channelId;
+            showChannelWave(channelId, data);
         });
 
         ipcRenderer.on('wave-length-show', (event, data) => {
@@ -46,6 +45,18 @@ function Home() {
         };
     }, []);
 
+    const showChannelWave = (channelId, data) =>{
+        echartOptionArray[channelId].xAxis[0].data = JSON.parse(data).content[0];
+        let ydata = JSON.parse(data).content[1].map(x => x == 0 ? 0.5: x).map(x => 10 * Math.log10(x/2500000));
+        // @ts-ignore
+        echartOptionArray[channelId].yAxis[0].min = Math.min(...ydata).toFixed(5) ;
+        // @ts-ignore
+        echartOptionArray[channelId].yAxis[0].max = Math.max(...ydata).toFixed(5) ;
+        echartOptionArray[channelId].series[0].data = ydata;
+        echartOptionArray[channelId].series[0].name = "通道"+ channelId + "光谱图";
+        echartRefArray[channelId].current.getEchartsInstance().setOption(echartOption);
+    }
+
     const clearOutput = () => {
         setOutputMsg('');
     }
@@ -57,9 +68,11 @@ function Home() {
 
         ipcRenderer.send('voggex-stop', '');
 
-        echartOption.xAxis[0].data = [];
-        echartOption.series[0].data = [];
-        echartRef.current.getEchartsInstance().setOption(echartOption);
+        for(let i=0 ; i < 4; i++ ){
+            echartOptionArray[i].xAxis[0].data = [];
+            echartOptionArray[i].series[0].data = [];
+            echartRefArray[i].current.getEchartsInstance().setOption(echartOptionArray[i]);
+        }
     }
 
     const spectralView = () => {
@@ -100,12 +113,19 @@ function Home() {
                         </Button>
                     </Space>
                 </Row>
+                <br/>
+
+                <ReactECharts  ref={echartRef0}
+                               option={echartOption}/>
+                <ReactECharts  ref={echartRef1}
+                               option={echart1Option}/>
+                <ReactECharts  ref={echartRef2}
+                               option={echart2Option}/>
+                <ReactECharts  ref={echartRef3}
+                               option={echart3Option}/>
             </Content>
 
-            <br/>
-            <ReactECharts  ref={echartRef}
-                option={echartOption}
-                          style={{ height: '500px' }}/>
+
         </React.Fragment>
     );
 };

@@ -5,6 +5,7 @@ import {Button, Input, Layout, Row, Space} from 'antd';
 import ReactECharts from "echarts-for-react";
 
 import {echart1Option, echart2Option, echart3Option, echartOption, echartOptionArray} from "../preload/homeData";
+import Link from "next/link";
 
 const { TextArea } = Input;
 
@@ -54,7 +55,7 @@ function Home() {
         echartOptionArray[channelId].yAxis[0].max = Math.max(...ydata).toFixed(5) ;
         echartOptionArray[channelId].series[0].data = ydata;
         echartOptionArray[channelId].series[0].name = "通道"+ channelId + "光谱图";
-        echartRefArray[channelId].current.getEchartsInstance().setOption(echartOption);
+        echartRefArray[channelId].current.getEchartsInstance().setOption(echartOptionArray[channelId]);
     }
 
     const clearOutput = () => {
@@ -115,6 +116,9 @@ function Home() {
                 </Row>
                 <br/>
 
+{/*                <Link href="/next">
+                    <a>Detail</a>
+                </Link>*/}
                 <ReactECharts  ref={echartRef0}
                                option={echartOption}/>
                 <ReactECharts  ref={echartRef1}

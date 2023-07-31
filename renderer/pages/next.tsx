@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import ReactECharts from 'echarts-for-react';
@@ -6,11 +6,14 @@ import {
   Layout,
   Result,
 } from 'antd';
+import electron from "electron";
 
 const {
   Header,
   Content,
 } = Layout;
+
+const ipcRenderer = electron.ipcRenderer;
 
 const colors: string[] = ['#5470C6', '#EE6666'];
 const option = {
@@ -74,6 +77,31 @@ const option = {
 };
 
 function Next() {
+
+    const echartRef =  useRef(null);
+
+    React.useEffect(() => {
+
+        ipcRenderer.on('spectral-view-show', (event, data) => {
+            let channelId = JSON.parse(data).channelId;
+            if(channelId == 0){
+                option.xAxis[0].data = JSON.parse(data).content[0];
+                let ydata = JSON.parse(data).content[1].map(x => x == 0 ? 0.5: x).map(x => 10 * Math.log10(x/2500000));
+                // @ts-ignore
+                option.yAxis[0].min = Math.min(...ydata).toFixed(5) ;
+                // @ts-ignore
+                option.yAxis[0].max = Math.max(...ydata).toFixed(5) ;
+                option.series[0].data = ydata;
+                option.series[0].name = "通道0光谱图";
+                echartRef.current.getEchartsInstance().setOption(option);
+            }
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners('spectral-view-show');
+        };
+    }, []);
+
   return (
     <React.Fragment>
       <Head>
@@ -82,12 +110,12 @@ function Next() {
 
       <Header>
         <Link href="/home">
-          <a>Go to Udp page</a>
+          <a>Main</a>
         </Link>
       </Header>
 
-      <Content style={{ padding: 48 }}>
-          <ReactECharts option={option} />
+      <Content style={{ padding: 48}} >
+          <ReactECharts ref={echartRef} option={option}  style={{ height: 800 }}/>
       </Content>
     </React.Fragment>
   );

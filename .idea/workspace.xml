@@ -7,6 +7,7 @@
     <list default="true" id="193baa47-951d-49d1-9820-414438fc94b2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/renderer/pages/home.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/renderer/pages/home.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/renderer/pages/next.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/renderer/pages/next.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +30,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/work/nextron/nextron-voggex-dynamic2&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/work/nextron/nextron-voggex-dynamic/renderer&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -40,6 +41,9 @@
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\work\nextron\nextron-voggex-dynamic\renderer" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\work\nextron\nextron-voggex-dynamic\main" />
     </key>
@@ -61,6 +65,31 @@
       <workItem from="1690350611664" duration="4196000" />
       <workItem from="1690354849894" duration="240000" />
       <workItem from="1690355244098" duration="61000" />
+      <workItem from="1690355472787" duration="1252000" />
+      <workItem from="1690417814536" duration="178000" />
+      <workItem from="1690418238682" duration="1209000" />
+      <workItem from="1690421449002" duration="270000" />
+      <workItem from="1690421789336" duration="81000" />
+      <workItem from="1690424866688" duration="382000" />
+      <workItem from="1690425263997" duration="8000" />
+      <workItem from="1690510342262" duration="2980000" />
+      <workItem from="1690513695961" duration="405000" />
+      <workItem from="1690515240976" duration="200000" />
+      <workItem from="1690515568174" duration="1310000" />
+      <workItem from="1690521377000" duration="603000" />
+      <workItem from="1690522102392" duration="1317000" />
+      <workItem from="1690523638390" duration="888000" />
+      <workItem from="1690525383049" duration="7167000" />
+      <workItem from="1690535903148" duration="552000" />
+      <workItem from="1690536603537" duration="137000" />
+      <workItem from="1690763686899" duration="2055000" />
+      <workItem from="1690765880099" duration="890000" />
+      <workItem from="1690767175108" duration="3074000" />
+      <workItem from="1690770376616" duration="445000" />
+      <workItem from="1690771143290" duration="5139000" />
+      <workItem from="1690781896985" duration="467000" />
+      <workItem from="1690782696080" duration="5075000" />
+      <workItem from="1690791282063" duration="338000" />
     </task>
     <servers />
   </component>

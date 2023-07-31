@@ -29,16 +29,15 @@ function Home() {
             echartOption.xAxis[0].data = JSON.parse(data).content[0];
             let ydata = JSON.parse(data).content[1].map(x => x == 0 ? 0.5: x).map(x => 10 * Math.log10(x/2500000));
             // @ts-ignore
-            echartOption.yAxis[0].min = Math.min(...ydata).toFixed(3) ;
+            echartOption.yAxis[0].min = Math.min(...ydata).toFixed(5) ;
             // @ts-ignore
-            echartOption.yAxis[0].max = Math.max(...ydata).toFixed(3) ;
+            echartOption.yAxis[0].max = Math.max(...ydata).toFixed(5) ;
             echartOption.series[0].data = ydata;
             echartRef.current.getEchartsInstance().setOption(echartOption);
         });
 
         ipcRenderer.on('wave-length-show', (event, data) => {
             setOutputMsg(data);
-            setSpvwDisabled(false);
         });
 
         return () => {
@@ -51,12 +50,12 @@ function Home() {
         setOutputMsg('');
     }
 
-    const stopShowWave = () => {
+    const stopVoggex = () => {
         setStopDisabled(true);
         setSpvwDisabled(false);
         setLengthDisabled(false);
 
-        ipcRenderer && ipcRenderer.send('spectral-view-stop', '');
+        ipcRenderer.send('voggex-stop', '');
 
         echartOption.xAxis[0].data = [];
         echartOption.series[0].data = [];
@@ -71,7 +70,9 @@ function Home() {
     }
 
     const waveLength = () => {
+        setStopDisabled(false);
         setSpvwDisabled(true);
+        setLengthDisabled(true);
         ipcRenderer.send('get-wave-length', '');
     }
 
@@ -85,7 +86,7 @@ function Home() {
                 <Row>
                     <Space size={16}>
                         <Button disabled={spvwDisabled} onClick={() => spectralView()} size='large' type='primary'>Spectral View</Button>
-                        <Button disabled={stopDisabled} onClick={() => stopShowWave()} size='large' type='primary'>Stop</Button>
+                        <Button disabled={stopDisabled} onClick={() => stopVoggex()} size='large' type='primary'>Stop</Button>
                         <Button disabled={lengthDisabled} onClick={() => waveLength()} size='large' type='primary'>Wave length</Button>
                     </Space>
                 </Row>

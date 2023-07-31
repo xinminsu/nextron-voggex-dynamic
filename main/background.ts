@@ -2,7 +2,7 @@ import { app, ipcMain } from 'electron';
 import serve from 'electron-serve';
 import { createWindow } from './helpers';
 import dgram from 'dgram';
-import {localIP, localPort, remoteIP, remotePort} from "./utils/const";
+import {localPort, remoteIP, remotePort} from "./utils/const";
 import {generateAxis, getWaveLengthInfo} from "./utils/algorithm";
 import {ArraytoStringArray, string2ArrayBuffer, Uint8ArraytoNumberArray} from "./utils/strUtil";
 
@@ -30,10 +30,11 @@ let rawBufferU8A:Uint8Array;
 const spvwStringMsg = "30 07 06 00 00 00";
 const spvwMsg = string2ArrayBuffer(spvwStringMsg.replaceAll(" ", ""));
 
-const waveLengStringMsg = "30 02 06 00 00 00";
-const waveLengMsg = string2ArrayBuffer(waveLengStringMsg.replaceAll(" ", ""));
+const waveLengthStringMsg = "30 02 06 00 00 00";
+const waveLengthMsg = string2ArrayBuffer(waveLengthStringMsg.replaceAll(" ", ""));
 
-let waveContinue = false;
+let spectralViewContinue = false;
+let waveLengthContinue = false;
 
 (async () => {
   await app.whenReady();
@@ -58,12 +59,15 @@ let waveContinue = false;
     rawBufferU8A = new Uint8Array(rawTotalBuffer);
     //console.log("recv raw hex msg length is " + rawBufferU8A.length);
     if (rawBufferU8A.length == 1208) {
-      mainWindow.webContents.send("wave-length-show",
-          `${getWaveLengthInfo(rawBufferU8A)}`);
+      if (waveLengthContinue) {
+        mainWindow.webContents.send("wave-length-show",
+            `${getWaveLengthInfo(rawBufferU8A)}`);
+        udpSocket.send(waveLengthMsg, remotePort, remoteIP);
+      }
       rawTotalBuffer = Buffer.alloc(0);
     }
     if ( rawBufferU8A.length == 4101) {
-      if(waveContinue){
+      if(spectralViewContinue){
         mainWindow.webContents.send("spectral-view-show",
             `{"content":[[${ArraytoStringArray(generateAxis())}],[${Uint8ArraytoNumberArray(rawBufferU8A)}]]}`);
         udpSocket.send(spvwMsg, remotePort, remoteIP);
@@ -81,14 +85,19 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('spectral-view-start', (event, arg) => {
-  waveContinue = true;
+  console.log("ipcMain spectral-view-start " );
+  spectralViewContinue = true;
   udpSocket.send(spvwMsg, remotePort, remoteIP);
 });
 
-ipcMain.on('spectral-view-stop', (event, arg) => {
-  waveContinue = false;
+ipcMain.on('voggex-stop', (event, arg) => {
+  console.log("ipcMain voggex-stop " );
+  spectralViewContinue = false;
+  waveLengthContinue = false;
 });
 
 ipcMain.on('get-wave-length', (event, arg) => {
-  udpSocket.send(waveLengMsg, remotePort, remoteIP);
+  console.log("ipcMain get-wave-length " );
+  waveLengthContinue = true;
+  udpSocket.send(waveLengthMsg, remotePort, remoteIP);
 });

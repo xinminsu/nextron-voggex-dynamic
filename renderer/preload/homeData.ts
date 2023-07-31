@@ -48,7 +48,7 @@ export var echartOption = {
                 formatter: '{value} db'
             },
             min: -60,
-            max: -40,
+            max: -60,
         }
     ],
     series: [

@@ -7,4 +7,5 @@ export const waveLengthStringMsg = "30 02 06 00 00 00";
 export const waveLengthMsg = string2ArrayBuffer(waveLengthStringMsg.replaceAll(" ", ""));
 
 export const spvwStringMsgArray = ["30 07 06 00 00 00","30 07 06 00 00 01",
-    "30 07 06 00 00 02","30 07 06 00 00 03"];
+    "30 07 06 00 00 02","30 07 06 00 00 03","30 07 06 00 00 04","30 07 06 00 00 05",
+    "30 07 06 00 00 06","30 07 06 00 00 07"];

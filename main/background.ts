@@ -6,6 +6,9 @@ import {localPort, remoteIP, remotePort} from "./utils/const";
 import {generateAxis, getWaveLengthInfo} from "./utils/algorithm";
 import {ArraytoStringArray, string2ArrayBuffer, Uint8ArraytoNumberArray} from "./utils/strUtil";
 import {spvwMsg, spvwStringMsg, spvwStringMsgArray, waveLengthMsg} from "./message/voggexMessage";
+import Store from "electron-store";
+
+const store = new Store();
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
 
@@ -30,8 +33,10 @@ let rawBufferU8A:Uint8Array;
 
 let spectralViewContinue = false;
 let waveLengthContinue = false;
+let oneSpectralViewContinue = false;
 
 let curChannel = 0;
+let oneChannelId = 0;
 
 (async () => {
   await app.whenReady();
@@ -64,13 +69,21 @@ let curChannel = 0;
       rawTotalBuffer = Buffer.alloc(0);
     }
     if ( rawBufferU8A.length == 4101) {
-      if(spectralViewContinue){
+      if(spectralViewContinue && !oneSpectralViewContinue){
+        //console.log(" channelId = " + curChannel);
         mainWindow.webContents.send("spectral-view-show",
             `{"channelId":${curChannel},"content":[[${ArraytoStringArray(generateAxis())}],[${Uint8ArraytoNumberArray(rawBufferU8A)}]]}`);
         curChannel ++;
-        curChannel = curChannel % 4;
+        curChannel = curChannel % 8;
         let curSpvwMsg = string2ArrayBuffer(spvwStringMsgArray[curChannel].replaceAll(" ", ""));
         udpSocket.send(curSpvwMsg, remotePort, remoteIP);
+      }
+      if (oneSpectralViewContinue && !spectralViewContinue) {
+        //console.log(" oneChannelId = " + oneChannelId);
+        mainWindow.webContents.send("one-spectral-view-show",
+            `{"content":[[${ArraytoStringArray(generateAxis())}],[${Uint8ArraytoNumberArray(rawBufferU8A)}]]}`);
+        let curOneSpvwMsg = string2ArrayBuffer(spvwStringMsgArray[oneChannelId].replaceAll(" ", ""));
+        udpSocket.send(curOneSpvwMsg, remotePort, remoteIP);
       }
       rawTotalBuffer = Buffer.alloc(0);
     }
@@ -84,9 +97,25 @@ app.on('window-all-closed', () => {
   app.quit();
 });
 
+ipcMain.on('one-spectral-view-start', (event, arg) => {
+  console.log("ipcMain one-spectral-view-start " + arg );
+  oneChannelId = arg;
+  spectralViewContinue = false;
+  waveLengthContinue = false;
+  oneSpectralViewContinue = true;
+  let curOneSpvwMsg = string2ArrayBuffer(spvwStringMsgArray[oneChannelId].replaceAll(" ", ""));
+  udpSocket.send(curOneSpvwMsg, remotePort, remoteIP);
+});
+
+ipcMain.on('one-spectral-view-stop', (event, arg) => {
+  oneSpectralViewContinue = false;
+});
+
 ipcMain.on('spectral-view-start', (event, arg) => {
   console.log("ipcMain spectral-view-start " );
   spectralViewContinue = true;
+  oneSpectralViewContinue = false;
+  curChannel = 0;
   udpSocket.send(spvwMsg, remotePort, remoteIP);
 });
 
@@ -94,10 +123,21 @@ ipcMain.on('voggex-stop', (event, arg) => {
   console.log("ipcMain voggex-stop " );
   spectralViewContinue = false;
   waveLengthContinue = false;
+  oneSpectralViewContinue = false;
 });
 
 ipcMain.on('get-wave-length', (event, arg) => {
   console.log("ipcMain get-wave-length " );
   waveLengthContinue = true;
+  spectralViewContinue = false;
+  oneSpectralViewContinue = false;
   udpSocket.send(waveLengthMsg, remotePort, remoteIP);
 });
+
+/*ipcMain.on('get-udpUIType', (event, arg) => {
+  event.returnValue = store.get('udpUIType');
+});
+
+ipcMain.on('set-udpUIType', (event, arg) => {
+  store.set('udpUIType',arg);
+});*/

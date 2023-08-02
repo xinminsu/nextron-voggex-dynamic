@@ -1,4 +1,5 @@
 import {axisdata, seriesdata} from "./testData";
+import clone from 'lodash.clone';
 
 const colors: string[] = ['#5470C6', '#EE6666'];
 export var echartOption = {
@@ -48,7 +49,7 @@ export var echartOption = {
                 formatter: '{value} db'
             },
             min: -60,
-            max: -60,
+            max: -30,
         }
     ],
     series: [
@@ -64,8 +65,51 @@ export var echartOption = {
     ]
 };
 
-export var echart1Option = Object.assign({}, echartOption);
-export var echart2Option = Object.assign({}, echartOption);
-export var echart3Option = Object.assign({}, echartOption);
+export var echart1Option = clone(echartOption);
+export var echart2Option = clone(echartOption);
+export var echart3Option = clone(echartOption);
+export var echart4Option = clone(echartOption);
+export var echart5Option = clone(echartOption);
+export var echart6Option = clone(echartOption);
+export var echart7Option = clone(echartOption);
+export var oneEchartOption = clone(echartOption);
+//oneEchartOption.xAxis[0].data = axisdata;
+//oneEchartOption.series[0].data = seriesdata.map(x => x == 0 ? 0.5: x).map(x => 10 * Math.log10(x/2500000));
+//export default oneEchartOption;
 
-export var echartOptionArray = [echartOption, echart1Option, echart2Option, echart3Option];
+export var echartOptionArray = [echartOption, echart1Option, echart2Option, echart3Option,
+    echart4Option, echart5Option, echart6Option, echart7Option];
+
+export const waves = [
+    {
+        id: 1,
+        name: 'channel1'
+    },
+    {
+        id: 2,
+        name: 'channel2'
+    },
+    {
+        id: 3,
+        name: 'channel3'
+    },
+    {
+        id: 4,
+        name: 'channel4'
+    },
+    {
+        id: 5,
+        name: 'channel5'
+    },
+    {
+        id: 6,
+        name: 'channel6'
+    },
+    {
+        id: 7,
+        name: 'channel7'
+    },
+    {
+        id: 8,
+        name: 'channel8'
+    }]

@@ -26,7 +26,7 @@ export const addWaveLengthToDb = async (wlData: number[][]) => {
     for (let i = 0; i < 8; i++)
     {
         for (let j = 0; j < 30; j++) {
-            if(wlData[i][j] > 0.1) {
+            if(wlData[i][j] > 0.01) {
                 let waveLength = {
                     channelId : i,
                     index: j,
@@ -44,7 +44,7 @@ export const getWaveLengthInfo = (wlData: number[][]): string => {
     {
         let resulti = '通道' + (i + 1) + ": ";
         for (let j = 0; j < 30; j++) {
-            if(wlData[i][j] > 0.0001) {
+            if(wlData[i][j] > 0.01) {
                 resulti += wlData[i][j].toFixed(3) + ' ';
             }
         }

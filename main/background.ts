@@ -3,7 +3,7 @@ import serve from 'electron-serve';
 import { createWindow } from './helpers';
 import dgram from 'dgram';
 import {localPort, remoteIP, remotePort} from "./utils/const";
-import {generateAxis, getWaveLengthInfo} from "./utils/algorithm";
+import {addWaveLengthToDb, generateAxis, getWaveLengthData, getWaveLengthInfo} from "./utils/algorithm";
 import {ArraytoStringArray, string2ArrayBuffer, Uint8ArraytoNumberArray} from "./utils/strUtil";
 import {spvwMsg, spvwStringMsg, spvwStringMsgArray, waveLengthMsg} from "./message/voggexMessage";
 import Store from "electron-store";
@@ -62,8 +62,10 @@ let oneChannelId = 0;
     //console.log("recv raw hex msg length is " + rawBufferU8A.length);
     if (rawBufferU8A.length == 1208) {
       if (waveLengthContinue) {
+        let wlData = getWaveLengthData(rawBufferU8A);
+        addWaveLengthToDb(wlData);
         mainWindow.webContents.send("wave-length-show",
-            `${getWaveLengthInfo(rawBufferU8A)}`);
+            `${getWaveLengthInfo(wlData)}`);
         udpSocket.send(waveLengthMsg, remotePort, remoteIP);
       }
       rawTotalBuffer = Buffer.alloc(0);

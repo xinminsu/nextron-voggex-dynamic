@@ -11,11 +11,13 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "axios": "^1.4.0",
     "echarts": "^5.4.3",
     "echarts-for-react": "^3.0.2",
     "electron-serve": "^1.1.0",
     "electron-store": "^8.1.0",
-    "lodash.clone": "^4.5.0"
+    "lodash.clone": "^4.5.0",
+    "serverless-mysql": "^1.5.5"
   },
   "devDependencies": {
     "@ant-design/icons": "^4.7.0",

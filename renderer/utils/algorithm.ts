@@ -8,7 +8,7 @@ export const addWaveLengthToDb = async (wlData: number[][]) => {
                 let waveLength = {
                     channelId : i,
                     index: j,
-                    value: wlData[i][j],
+                    value: wlData[i][j]
                 };
                 await axios.post("/api/wave", waveLength);
             }

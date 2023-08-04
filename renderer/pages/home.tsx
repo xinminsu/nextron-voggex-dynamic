@@ -9,6 +9,9 @@ import {echart1Option, echart2Option, echart3Option, echartOption,
 import WaveComponent from "../components/Wave";
 import {UdpUIType} from "../data/persistence";
 import {useRouter} from "next/router";
+import {addWaveLengthToDb, generateAxis, getWaveLengthInfo} from "../utils/algorithm";
+import {ArraytoStringArray} from "../utils/strUtil";
+
 
 const { TextArea } = Input;
 
@@ -48,7 +51,7 @@ function Home() {
         });
 
         ipcRenderer.on('wave-length-show', (event, data) => {
-            setOutputMsg(data);
+            processWaveLength(data);
         });
 
         //setUdpUIType(ipcRenderer.sendSync('get-udpUIType'));
@@ -60,8 +63,8 @@ function Home() {
     }, []);
 
     const showChannelWave = (channelId, data) =>{
-        echartOptionArray[channelId].xAxis[0].data = JSON.parse(data).content[0];
-        let ydata = JSON.parse(data).content[1].map(x => x == 0 ? 0.5: x).map(x => 10 * Math.log10(x/2500000));
+        echartOptionArray[channelId].xAxis[0].data = ArraytoStringArray(generateAxis());
+        let ydata = JSON.parse(data).content.map(x => x == 0 ? 0.5: x).map(x => 10 * Math.log10(x/2500000));
         // @ts-ignore
         echartOptionArray[channelId].yAxis[0].min = Math.min(...ydata).toFixed(5) ;
         // @ts-ignore
@@ -69,6 +72,15 @@ function Home() {
         echartOptionArray[channelId].series[0].data = ydata;
         echartOptionArray[channelId].series[0].name = "通道"+ channelId + "光谱图";
         echartRefArray[channelId].current.getEchartsInstance().setOption(echartOptionArray[channelId]);
+    }
+
+    const processWaveLength = async (wlData: number[][]) => {
+        setOutputMsg(getWaveLengthInfo(wlData));
+        try {
+            await addWaveLengthToDb(wlData);
+        } catch (error) {
+            console.log('addWaveLengthToDb .' + error);
+        }
     }
 
     const clearOutput = () => {

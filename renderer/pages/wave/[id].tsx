@@ -9,6 +9,8 @@ import {
 } from 'antd';
 import electron from "electron";
 import {echartOptionArray, oneEchartOption} from "../../preload/homeData";
+import {ArraytoStringArray} from "../../utils/strUtil";
+import {generateAxis} from "../../utils/algorithm";
 
 const {
     Header,
@@ -29,8 +31,8 @@ function WavePage() {
     React.useEffect(() => {
 
         ipcRenderer.on('one-spectral-view-show', (event, data) => {
-            oneEchartOption.xAxis[0].data = JSON.parse(data).content[0];
-            let ydata = JSON.parse(data).content[1].map(x => x == 0 ? 0.5 : x).map(x => 10 * Math.log10(x / 2500000));
+            oneEchartOption.xAxis[0].data = ArraytoStringArray(generateAxis());
+            let ydata = JSON.parse(data).content.map(x => x == 0 ? 0.5 : x).map(x => 10 * Math.log10(x / 2500000));
             // @ts-ignore
             oneEchartOption.yAxis[0].min = Math.min(...ydata).toFixed(5);
             // @ts-ignore

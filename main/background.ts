@@ -3,8 +3,8 @@ import serve from 'electron-serve';
 import { createWindow } from './helpers';
 import dgram from 'dgram';
 import {localPort, remoteIP, remotePort} from "./utils/const";
-import {addWaveLengthToDb, generateAxis, getWaveLengthData, getWaveLengthInfo} from "./utils/algorithm";
-import {ArraytoStringArray, string2ArrayBuffer, Uint8ArraytoNumberArray} from "./utils/strUtil";
+import { getWaveLengthData} from "./utils/algorithm";
+import {string2ArrayBuffer, Uint8ArraytoNumberArray} from "./utils/strUtil";
 import {spvwMsg, spvwStringMsg, spvwStringMsgArray, waveLengthMsg} from "./message/voggexMessage";
 import Store from "electron-store";
 
@@ -63,9 +63,8 @@ let oneChannelId = 0;
     if (rawBufferU8A.length == 1208) {
       if (waveLengthContinue) {
         let wlData = getWaveLengthData(rawBufferU8A);
-        addWaveLengthToDb(wlData);
         mainWindow.webContents.send("wave-length-show",
-            `${getWaveLengthInfo(wlData)}`);
+            wlData);
         udpSocket.send(waveLengthMsg, remotePort, remoteIP);
       }
       rawTotalBuffer = Buffer.alloc(0);
@@ -74,7 +73,7 @@ let oneChannelId = 0;
       if(spectralViewContinue && !oneSpectralViewContinue){
         //console.log(" channelId = " + curChannel);
         mainWindow.webContents.send("spectral-view-show",
-            `{"channelId":${curChannel},"content":[[${ArraytoStringArray(generateAxis())}],[${Uint8ArraytoNumberArray(rawBufferU8A)}]]}`);
+            `{"channelId":${curChannel},"content":[${Uint8ArraytoNumberArray(rawBufferU8A)}]}`);
         curChannel ++;
         curChannel = curChannel % 8;
         let curSpvwMsg = string2ArrayBuffer(spvwStringMsgArray[curChannel].replaceAll(" ", ""));
@@ -83,7 +82,7 @@ let oneChannelId = 0;
       if (oneSpectralViewContinue && !spectralViewContinue) {
         //console.log(" oneChannelId = " + oneChannelId);
         mainWindow.webContents.send("one-spectral-view-show",
-            `{"content":[[${ArraytoStringArray(generateAxis())}],[${Uint8ArraytoNumberArray(rawBufferU8A)}]]}`);
+            `{"content":[${Uint8ArraytoNumberArray(rawBufferU8A)}]}`);
         let curOneSpvwMsg = string2ArrayBuffer(spvwStringMsgArray[oneChannelId].replaceAll(" ", ""));
         udpSocket.send(curOneSpvwMsg, remotePort, remoteIP);
       }

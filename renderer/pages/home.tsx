@@ -82,7 +82,7 @@ function Home() {
 
         ipcRenderer.send('voggex-stop', '');
 
-        for(let i=0 ; i < 4; i++ ){
+        for(let i=0 ; i < 8; i++ ){
             echartOptionArray[i].xAxis[0].data = [];
             echartOptionArray[i].series[0].data = [];
             echartRefArray[i].current.getEchartsInstance().setOption(echartOptionArray[i]);
@@ -107,12 +107,12 @@ function Home() {
             setStopDisabled(true);
             setSpvwDisabled(false);
             setLengthDisabled(fal);
-        }
-
-        if (query.name == 'home'){
-            console.log("back to home");
-            //resetButton();
         }*/
+
+    /*if (query.name == 'home') {
+        console.log("back to home");
+        }
+    }*/
 
     return (
         <React.Fragment>

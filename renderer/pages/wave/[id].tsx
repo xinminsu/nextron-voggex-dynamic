@@ -8,7 +8,7 @@ import {
     Result,
 } from 'antd';
 import electron from "electron";
-import {oneEchartOption} from "../../preload/homeData";
+import {echartOptionArray, oneEchartOption} from "../../preload/homeData";
 
 const {
     Header,
@@ -47,6 +47,10 @@ function WavePage() {
 
     const backHome = () => {
         ipcRenderer.send('one-spectral-view-stop', curChannelId);
+        for(let i=0 ; i < 8; i++ ){
+            echartOptionArray[i].xAxis[0].data = [];
+            echartOptionArray[i].series[0].data = [];
+        }
     }
 
     return (

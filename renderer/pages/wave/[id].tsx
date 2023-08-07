@@ -52,6 +52,7 @@ function WavePage() {
         for(let i=0 ; i < 8; i++ ){
             echartOptionArray[i].xAxis[0].data = [];
             echartOptionArray[i].series[0].data = [];
+            echartOptionArray[i].series[0].name = "通道光谱图"
         }
     }
 

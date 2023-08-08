@@ -2,6 +2,8 @@ export enum MsgType {
     None,
     SpectralView,
     GainSettings,
+    SimilaritySettings,
+    SaveSettings,
     ThresholdSettings,
     WaveLength,
     ParameterSave,
@@ -35,6 +37,16 @@ export const SpectralViewVoggexMessage: VoggexMessage = {
 export const GainSettingsVoggexMessage: VoggexMessage = {
     type: MsgType.GainSettings,
     content: "20 03 06 07 80 04"
+};
+
+export const SimilaritySettingsVoggexMessage: VoggexMessage = {
+    type: MsgType.SimilaritySettings,
+    content: "20 02 06 01 70 01"
+};
+
+export const SaveSettingsVoggexMessage: VoggexMessage = {
+    type: MsgType.SaveSettings,
+    content: "20 06 04 00"
 };
 
 export const ThresholdSettingsVoggexMessage: VoggexMessage = {
@@ -95,12 +107,16 @@ export const AutomatictuningGainVoggexMessage: VoggexMessage = {
     type: MsgType.AutomatictuningGain
 } as VoggexMessage;
 
-export const getVoggexMessageContent = (type) => {
+export const getVoggexMessageContent = (type, channelId= 0, data = 0) => {
     switch (type) {
         case MsgType.SpectralView:
             return "30 07 06 00 00 00";
         case MsgType.GainSettings:
-            return "20 03 06 07 80 04";
+            return "20 03 06 " + channelId.toString(16).padStart(2, '0') + " 80 " +  data.toString(16).padStart(2, '0');
+        case MsgType.SimilaritySettings:
+            return "20 02 06 " + channelId.toString(16).padStart(2, '0') + " 70 " +  data.toString(16).padStart(2, '0');
+        case MsgType.SaveSettings:
+            return "20 06 04 00";
         case MsgType.ThresholdSettings:
             return "20 02 06 07 70 20";
         case MsgType.WaveLength:

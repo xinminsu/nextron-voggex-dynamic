@@ -55,7 +55,16 @@ function UdpConfig() {
 
     const handleChange = (value: MsgType) => {
         setCurMsg(value);
-        setSendMsg(getVoggexMessageContent(value));
+        let data;
+        switch (value){
+            case MsgType.GainSettings:
+                data = gain;
+                break;
+            case MsgType.SimilaritySettings:
+                data = similarity;
+                break;
+        }
+        setSendMsg(getVoggexMessageContent(value,channelId, data));
     };
 
     const backHome = () => {

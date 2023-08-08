@@ -6,6 +6,8 @@ export const selectOption = [
     { value: MsgType.None, label: 'None' },
     //{ value: MsgType.SpectralView, label: 'SpectralView' },
     { value: MsgType.GainSettings, label: 'GainSettings' },
+    { value: MsgType.SimilaritySettings, label: 'SimilaritySettings' },
+    { value: MsgType.SaveSettings, label: 'SaveSettings' },
     { value: MsgType.ThresholdSettings, label: 'ThresholdSettings' },
     //{ value: MsgType.WaveLength, label: 'WaveLength'},
     { value: MsgType.ParameterSave, label: 'ParameterSave' },

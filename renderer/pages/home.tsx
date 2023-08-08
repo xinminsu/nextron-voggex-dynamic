@@ -11,6 +11,7 @@ import {UdpUIType} from "../data/persistence";
 import {useRouter} from "next/router";
 import {addWaveLengthToDb, generateAxis, getWaveLengthInfo} from "../utils/algorithm";
 import {ArraytoStringArray} from "../utils/strUtil";
+import Link from "next/link";
 
 
 const { TextArea } = Input;
@@ -138,6 +139,10 @@ function Home() {
                         <Button disabled={spvwDisabled} onClick={() => spectralView()} size='large' type='primary'>Spectral View</Button>
                         <Button disabled={stopDisabled} onClick={() => stopVoggex()} size='large' type='primary'>Stop</Button>
                         <Button disabled={lengthDisabled} onClick={() => waveLength()} size='large' type='primary'>Wave length</Button>
+
+                        <Link href="/udpConfig">
+                            <a>Udp Config</a>
+                        </Link>
                     </Space>
                 </Row>
                 <br/>

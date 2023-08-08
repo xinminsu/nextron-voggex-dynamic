@@ -135,6 +135,10 @@ ipcMain.on('get-wave-length', (event, arg) => {
   udpSocket.send(waveLengthMsg, remotePort, remoteIP);
 });
 
+ipcMain.on('udp-config', (event, arg) => {
+  spectralViewContinue = false;
+});
+
 /*ipcMain.on('get-udpUIType', (event, arg) => {
   event.returnValue = store.get('udpUIType');
 });

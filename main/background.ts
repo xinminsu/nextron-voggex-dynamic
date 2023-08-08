@@ -4,8 +4,14 @@ import { createWindow } from './helpers';
 import dgram from 'dgram';
 import {localPort, remoteIP, remotePort} from "./utils/const";
 import { getWaveLengthData} from "./utils/algorithm";
-import {string2ArrayBuffer, Uint8ArraytoNumberArray} from "./utils/strUtil";
-import {spvwMsg, spvwStringMsg, spvwStringMsgArray, waveLengthMsg} from "./message/voggexMessage";
+import {string2ArrayBuffer, toHexString, Uint8ArraytoNumberArray} from "./utils/strUtil";
+import {
+  checkNormalVoggexMessageByContent,
+  spvwMsg,
+  spvwStringMsg,
+  spvwStringMsgArray,
+  waveLengthMsg
+} from "./message/voggexMessage";
 import Store from "electron-store";
 
 const store = new Store();
@@ -19,6 +25,7 @@ if (isProd) {
 }
 
 let udpSocket;
+let normalMsg = true;
 const createSocket = () => {
   const socket = dgram.createSocket('udp4');
   return new Promise((resolve, reject) => {
@@ -60,7 +67,7 @@ let oneChannelId = 0;
     rawTotalBuffer = Buffer.concat([rawTotalBuffer, msg]);
     rawBufferU8A = new Uint8Array(rawTotalBuffer);
     //console.log("recv raw hex msg length is " + rawBufferU8A.length);
-    if (rawBufferU8A.length == 1208) {
+    if (!normalMsg && rawBufferU8A.length == 1208) {
       if (waveLengthContinue) {
         let wlData = getWaveLengthData(rawBufferU8A);
         mainWindow.webContents.send("wave-length-show",
@@ -69,7 +76,7 @@ let oneChannelId = 0;
       }
       rawTotalBuffer = Buffer.alloc(0);
     }
-    if ( rawBufferU8A.length == 4101) {
+    if ( !normalMsg && rawBufferU8A.length == 4101) {
       if(spectralViewContinue && !oneSpectralViewContinue){
         //console.log(" channelId = " + curChannel);
         mainWindow.webContents.send("spectral-view-show",
@@ -88,8 +95,12 @@ let oneChannelId = 0;
       }
       rawTotalBuffer = Buffer.alloc(0);
     }
+    if (normalMsg) {
+      mainWindow.webContents.send("normal-result",
+          `${toHexString(rawBufferU8A)}`);
+      rawTotalBuffer = Buffer.alloc(0);
+    }
   });
-
 
 })();
 
@@ -140,6 +151,13 @@ ipcMain.on('udp-config', (event, arg) => {
   oneSpectralViewContinue = false;
   waveLengthContinue = false;
 });
+
+ipcMain.on('udp-send', (event, arg) => {
+  normalMsg = checkNormalVoggexMessageByContent(arg);
+  //console.log('udp-send' + normalMsg);
+  udpSocket.send(string2ArrayBuffer(arg.replaceAll(" ", "")), remotePort, remoteIP);
+});
+
 
 /*ipcMain.on('get-udpUIType', (event, arg) => {
   event.returnValue = store.get('udpUIType');

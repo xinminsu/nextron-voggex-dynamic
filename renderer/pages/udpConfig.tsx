@@ -20,10 +20,14 @@ function UdpConfig() {
 
     ipcRenderer.send('udp-config');
 
-    let [sendMsg, setSendMsg] = useState("");
-    let [recvMsg, setRecvMsg] = useState("");
-    let [outputMsg, setOutputMsg] = useState("");
-    let [curMsg, setCurMsg ] = useState(MsgType.None);
+    const [sendMsg, setSendMsg] = useState("");
+    const [recvMsg, setRecvMsg] = useState("");
+    const [outputMsg, setOutputMsg] = useState("");
+    const [curMsg, setCurMsg ] = useState(MsgType.None);
+
+    const [channelId, setChannelId] = useState(0);
+    const [gain, setGain] = useState(0);
+    const [similarity, setSimilarity] = useState(0);
 
     React.useEffect(() => {
 
@@ -77,6 +81,21 @@ function UdpConfig() {
             <Content style={{padding: 48}}>
                 <Row>
                     <Col span={12}>
+                        <Space size={16}>
+                            <label>Channel ID:</label>
+                            <TextArea rows={1} value={channelId} style={{ width: '50px' }}/>
+
+                            <label>Gain:</label>
+                            <TextArea rows={1} value={gain} style={{ width: '50px' }}/>
+
+                            <label>Similarity:</label>
+                            <TextArea rows={1} value={similarity} style={{ width: '50px' }}/>
+
+                        </Space>
+
+                        <br/>
+                        <br/>
+                        
                         <label>Client:</label>
                         <br/>
                         <Space wrap>

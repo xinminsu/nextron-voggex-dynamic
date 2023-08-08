@@ -134,15 +134,19 @@ function Home() {
             </Head>
 
             <Content style={{padding: 48}}>
+
                 <Row>
                     <Space size={16}>
-                        <Button disabled={spvwDisabled} onClick={() => spectralView()} size='large' type='primary'>Spectral View</Button>
-                        <Button disabled={stopDisabled} onClick={() => stopVoggex()} size='large' type='primary'>Stop</Button>
-                        <Button disabled={lengthDisabled} onClick={() => waveLength()} size='large' type='primary'>Wave length</Button>
 
                         <Link href="/udpConfig">
                             <a>Udp Config</a>
                         </Link>
+
+                        <div style={{ width: '50px' }}/>
+
+                        <Button disabled={spvwDisabled} onClick={() => spectralView()} size='large' type='primary'>Spectral View</Button>
+                        <Button disabled={stopDisabled} onClick={() => stopVoggex()} size='large' type='primary'>Stop</Button>
+                        <Button disabled={lengthDisabled} onClick={() => waveLength()} size='large' type='primary'>Wave length</Button>
                     </Space>
                 </Row>
                 <br/>

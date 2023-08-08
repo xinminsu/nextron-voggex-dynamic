@@ -83,19 +83,22 @@ function UdpConfig() {
                     <Col span={12}>
                         <Space size={16}>
                             <label>Channel ID:</label>
-                            <TextArea rows={1} value={channelId} style={{ width: '50px' }}/>
+                            <TextArea rows={1} value={channelId} style={{ width: '50px' }}
+                                      onChange={e => setChannelId(e.target.value)} />
 
                             <label>Gain:</label>
-                            <TextArea rows={1} value={gain} style={{ width: '50px' }}/>
+                            <TextArea rows={1} value={gain} style={{ width: '50px' }}
+                                      onChange={e => setGain(e.target.value)}/>
 
                             <label>Similarity:</label>
-                            <TextArea rows={1} value={similarity} style={{ width: '50px' }}/>
+                            <TextArea rows={1} value={similarity} style={{ width: '50px' }}
+                                      onChange={e => setSimilarity(e.target.value)}/>
 
                         </Space>
 
                         <br/>
                         <br/>
-                        
+
                         <label>Client:</label>
                         <br/>
                         <Space wrap>

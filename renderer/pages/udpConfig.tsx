@@ -2,7 +2,7 @@ import electron from 'electron';
 import React, {useRef, useState} from 'react';
 import Head from 'next/head';
 
-import {Button, Col, Input, Layout, Row, Select, Space} from 'antd';
+import {Button, Col, Input, InputNumber, Layout, Row, Select, Space} from 'antd';
 import {getVoggexMessageContent, MsgType} from "../msg/voggexMessage";
 import {echartOption, echartOptionArray, selectOption} from "../preload/homeData";
 import Link from "next/link";
@@ -92,17 +92,18 @@ function UdpConfig() {
                     <Col span={12}>
                         <Space size={16}>
                             <label>Channel ID:</label>
-                            <TextArea rows={1} value={channelId} style={{ width: '50px' }}
-                                      onChange={e => setChannelId(parseInt(e.target.value))} />
+                            <InputNumber  min={0} max={7} defaultValue={0} onChange={(value: number) => {
+                                setChannelId(value);
+                            }} />
 
                             <label>Gain:</label>
-                            <TextArea rows={1} value={gain} style={{ width: '50px' }}
-                                      onChange={e => setGain(parseInt(e.target.value))}/>
-
+                            <InputNumber  min={0} max={5} defaultValue={0} onChange={(value: number) => {
+                                setGain(value);
+                            }} />
                             <label>Similarity:</label>
-                            <TextArea rows={1} value={similarity} style={{ width: '50px' }}
-                                      onChange={e => setSimilarity(parseInt(e.target.value))}/>
-
+                            <InputNumber  min={0} max={255} defaultValue={0} onChange={(value: number) => {
+                                setSimilarity(value);
+                            }} />
                         </Space>
 
                         <br/>

@@ -137,6 +137,8 @@ ipcMain.on('get-wave-length', (event, arg) => {
 
 ipcMain.on('udp-config', (event, arg) => {
   spectralViewContinue = false;
+  oneSpectralViewContinue = false;
+  waveLengthContinue = false;
 });
 
 /*ipcMain.on('get-udpUIType', (event, arg) => {
